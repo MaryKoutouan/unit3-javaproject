@@ -5,12 +5,21 @@
     <title>Vote Best Movie</title>
 </head>
 <body>
-  <form id="form" method="get" action="voteForBestMovie">
-    <input id="movieTitle" type="text" name="movieTitle">
+  <form id="form" method="put" action="voteForBestMovie">
+      <input id="user-name" type="text" name="userName">
+
+      <select name="movieId">
+          <option value="0">select movie</option>
+          <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}"></option>
+      </select>
+
       <input id="voteBtn" type="submit" value="Submit">
 
       <p th:text="'Your best movie is: ' + ${BestMovie}" />
 
   </form>
+
+    <a href="/">Home</a>
+
 </body>
 </html>

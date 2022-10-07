@@ -1,15 +1,16 @@
 package com.javaunit3.springmvc;
 
-import com.fasterxml.jackson.databind.deser.impl.PropertyValueBuffer;
-import org.apache.catalina.connector.Request;
+import com.javaunit3.springmvc.model.MovieEntity;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class MovieController {
@@ -33,8 +34,18 @@ public class MovieController {
         return "bestMovie";
     }
     @GetMapping("/voteForBestMovieForm")
-    public String getVoteBestMovieForm () {
-        
+    public String getVoteBestMovieFormPage (Model model) {
+
+        Session session = sessionFactory.getCurrentSession();
+
+        session.beginTransaction();
+
+        List<MovieEntity> movieEntityList = session.createQuery("from MovieEntity").list();
+
+        session.getTransaction().commit();
+
+        model.addAttribute("movies", movieEntityList);
+
         return "voteForBestMovie";
     }
     
@@ -45,7 +56,33 @@ public class MovieController {
 
         model.addAttribute(movieTitle);
 
+        String movieId = request.getParameter("movieId");
+        String voterName = request.getParameter("voterName");
+
         return "voteForBestMovie";
     }
 
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @RequestMapping(value = "/addMovieForm")
+    public String addMovieForm() {
+
+        return "addMovie";
+    }
+
+    @RequestMapping(value = "/addMovie")
+    public String addMovie(HttpServletRequest request) {
+
+        String movieTitle = request.getParameter("movieTitle");
+        String maturityRating = request.getParameter("maturityRating");
+        String genre = request.getParameter("genre");
+
+        MovieEntity movieEntity = new MovieEntity();
+        movieEntity.setTitle(movieTitle);
+        movieEntity.setMaturityRating(maturityRating);
+        movieEntity.setGenre(genre);
+
+        return "addMovie";
+    }
 }
